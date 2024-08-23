@@ -15,6 +15,9 @@ USER_LIST_FILE = 'userdata.json'
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def fetch_user_data(user_id):
+    """
+    Функция для получения данных пользователя.
+    """
     try:
         response = requests.get(f"https://funpay.com/users/{user_id}/", timeout=5)
         response.raise_for_status()
@@ -24,6 +27,9 @@ def fetch_user_data(user_id):
         return None
 
 def parse_reviews_count(soup):
+    """
+    парсит кол-во отзывов
+    """
     element = soup.find("div", {"class": "rating-full-count"})
     if element:
         return element.text.strip().replace("Всего ", "").replace("отзыв", "").replace('а', '').replace('ов', '').strip()
@@ -33,6 +39,9 @@ def parse_reviews_count(soup):
     return "Неизвестно"
 
 def parse_most_popular_game4reviews(soup):
+    """
+    самые популярные игры по отзывам #TODO парсит 25 отзывов, а и то меньше, чем надо, фикситб
+    """
     elements = soup.find_all("div", {"class": "review-item-user"})
     
     games = []
@@ -51,37 +60,58 @@ def parse_most_popular_game4reviews(soup):
     return [f"{game[0]} - {game[1]}" for game in top_games]
 
 def parse_username(soup):
+    """
+    парсит имя пользователя
+    """
     element = soup.find("span", {"class": "mr4"})
     if element:
         return element.text.strip()
     return "Неизвестно"
 
 def parse_estimation(soup):
+    """
+    парсит оценку пользователя
+    """
     element = soup.find("span", {"class": "big"})
     if element:
         return element.text.replace(' ', '').strip()
     return "Неизвестно"
 
 def parse_registration_date(soup):
+    """
+    парсит дату регистрации пользователя
+    """
     element = soup.find("div", {"class": "text-nowrap"})
     if element:
         return ' '.join(element.text.split())
     return "Неизвестно"
 
 def parse_offers_count(soup):
+    """
+    парсит кол-во предложений (категорий/игр)
+    """
     offers = soup.find_all("div", {"class": "offer"})
     return len(offers) - 1 #1 offer это отзывы)
 
 def parse_lot_count(soup):
+    """
+    парсит кол-во лотов
+    """
     return len(soup.find_all("a", {"class": "tc-item"}))
 
 def parse_status(soup):
+    """
+    парсит статус пользователя
+    """
     element = soup.find("div", {"class": "media-user-status"})
     if element:
         return element.text.strip()
     return "Неизвестно"
 
 def parse_price(soup):
+    """
+    парсит цену лотов
+    """
     max_price = -1
     max_price_link = None
     
@@ -101,6 +131,7 @@ def parse_price(soup):
     return (max_price, max_price_link) if max_price != -1 else "Неизвестно"
 
 def parse_avatar(soup):
+    """парс аватара"""
     element = soup.find("div", {"class": "avatar-photo"})
     if element:
         style = element.get("style")
@@ -109,6 +140,7 @@ def parse_avatar(soup):
             return avatar_link
 
 def parse_last_review(soup):
+    """парс  ласт отзыва"""
     element = soup.find("div", {"class": "review-container"})
     if element:
         lines = [line.strip() for line in element.text.strip().splitlines() if line.strip()]
@@ -128,6 +160,7 @@ def parse_last_review(soup):
     return "Нет отзывов, , , "
 
 def parse_average_price(soup):
+    """парс средней цены (прайс всех лотов / кол-во лотов)"""
     prices_list = []
 
     for element in soup.find_all("a", {"class": 'tc-item'}):
@@ -151,6 +184,7 @@ def parse_average_price(soup):
         logging.warning("Не найдено цены в разделе.")
 
 def parse_lots4prices(soup):
+    """парс лотов с ценами"""
     elements = soup.select("a.tc-item")
     data = []
 
@@ -169,6 +203,8 @@ def parse_lots4prices(soup):
     return data
 
 def save_user_data4file(soup, user_id, new_data): #TODO не обновляет данные (старые -> новые)
+    """
+    Сохраняет данные пользователя в JSON-файл"""
     try:
         with open(USER_LIST_FILE, "r", encoding="UTF-8") as f:
             data = json.load(f)
@@ -201,6 +237,7 @@ def save_user_data4file(soup, user_id, new_data): #TODO не обновляет 
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 def parse_usr_data(user_id):
+    """принт"""
     html_response = fetch_user_data(user_id)
     if html_response is None:
         return
