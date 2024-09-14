@@ -1,6 +1,9 @@
 # funpay_parser
 парсер профиля фанпей
 
+# Перед запуском
+создайте .env файл и в нем напишите TOKEN= и ваш токен тг бота
+
 <img width="755" alt="Снимок экрана 2024-08-23 в 11 58 11" src="https://github.com/user-attachments/assets/f8661059-5954-43fb-974b-a4c93fe574e6">
 (пример)
 
