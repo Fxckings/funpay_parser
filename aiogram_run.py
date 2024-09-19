@@ -1,9 +1,9 @@
 import asyncio
 from create_bot import bot, dp
-import logging
+from loguru import logger
 from tgbot import router
 
-logger = logging.getLogger(__name__)
+logger.add("tgbot.log", format="{time} | {level} | {message}", level="INFO")
 
 async def main():
     try:
